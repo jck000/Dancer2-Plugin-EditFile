@@ -78,9 +78,13 @@ A sample HTML page with Bootstrap and jQuery is included in the samples director
           file:    '/var/application/config3.xml'
           save:    0
       
-=over 
+=over 4
 
 B<Note> the  user B<must> have read/write access to the file being edited and the backup directory.  
+
+=back 
+
+=over 4
 
 =item I<backup>
 
@@ -95,6 +99,7 @@ Directory where original files should be saved.  Default = /tmp
 Defines display settings.
 
 =over 4
+
 =item I<method>
 
 Default 'get'.
@@ -112,22 +117,25 @@ Template cotaining edit/view form.  Default 'editfile.tt'
 Layout of template.  This is useful when opening a window to edit/view files.
 
 =back
+
 =item I<Save>
 
 =over 4
+
 =item I<method>
 
 Default 'get'.
 
 =item I<route>
 
+=back 
 
-=back
 =item I<files>
 
 List of predefined files that may be edited/viewed.
 
 =over 4
+
 =item I<file ids>
 
 A unique identifier for this file.  It's used as part of the route to identify this file.
@@ -325,8 +333,6 @@ sub save_editfile {
 
 =back
 
-=back
-
 
 =head1 AUTHOR
 
@@ -347,6 +353,7 @@ You can find documentation for this module with the perldoc command.
 
 
 You can also look for information at:
+
 =over 4
 
 
@@ -368,6 +375,7 @@ L<http://cpanratings.perl.org/d/Dancer2-Plugin-EditFile>
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Dancer2-Plugin-EditFile/>
+
 =back
 
 
