@@ -285,7 +285,7 @@ sub save_editfile {
   my $editedfile = $app->request->params->{editfile};
   my $files      = $plugin->files;
 
-  if ( ! $files->{$file_id}->{file} ) ;
+  if ( ! $files->{$file_id}->{file} ) {
     $status_message = "The specified id: $file_id is not properly defined in your configuration.";
   
   } elsif ( $plugin->{backup} && $plugin->{backup_dir} ) { 
@@ -314,7 +314,7 @@ sub save_editfile {
       open ( my $EDITFILE_OUT, ">", $files->{$file_id}->{file} ) ;
       print $EDITFILE_OUT $editedfile;
       close($EDITFILE_OUT);
-    }
+    };
     if ( $@ ) {
       $status_message = "Could not write changes to file.";
     }
