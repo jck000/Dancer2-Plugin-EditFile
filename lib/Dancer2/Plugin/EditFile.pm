@@ -17,12 +17,12 @@ Dancer2::Plugin::EditFile - Edit a text file from Dancer2
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 
 =cut
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 =head1 SYNOPSIS
 
@@ -32,12 +32,18 @@ our $VERSION = '0.004';
 
 =head1 DESCRIPTION
 
-This plugin will allow you to edit a text file from within Dancer2.  Edit it in the browser and save it to the drive.  It's designed to be flexible and unobtrusive.  Add or remove entries from the configuration file to activate or deactivate files that may be edited.  Set the URL for to edit and whether to backup the original.  The plugin will dynamically generate a route(s) in your application based on parameters.  Finally, you can even specify a template for it.  
+This plugin will allow you to retrieve a text file using Dancer2 and display it in an html page.  Also, it will save the edited file to it's location on the server.  
+
+It's designed to be flexible and unobtrusive.  It's behavior is customizable through Dancer's config file.  ration file to activate or deactivate files that may be edited.  Just include it in your Dancer2 script, set the configuration and use it.
 
 B<NOTES:>  
+
 =over 4
-=item B<It is your responsibility to set security.  So, be careful!!!>
-=item There is a sample template in the sample folder.
+
+B<It is your responsibility to set security.  So, be careful!!!>
+
+There is a sample template in the sample folder.
+
 =back
 
 =head1 CONFIGURATION
@@ -119,7 +125,7 @@ Default 'get'.
 =back
 =item I<files>
 
-List of predefine files that can be edited/viewed.
+List of predefined files that may be edited/viewed.
 
 =over 4
 =item I<file ids>
@@ -275,16 +281,14 @@ sub save_editfile {
 
   my $status_message = "";
 
-  my $file_id = $app->request->params->{id};
-  my $files   = $plugin->files;
+  my $file_id    = $app->request->params->{id};
+  my $editedfile = $app->request->params->{editfile};
+  my $files      = $plugin->files;
 
-  croak "The specified id: $file_id is not properly defined in your configuration."
-    if ( ! $files->{$file_id}->{file} ) ;
+  if ( ! $files->{$file_id}->{file} ) ;
+    $status_message = "The specified id: $file_id is not properly defined in your configuration.";
   
-  #
-  # Check for backup
-  #
-  if ( $plugin->{backup} && $plugin->{backup_dir} ) { 
+  } elsif ( $plugin->{backup} && $plugin->{backup_dir} ) { 
     if ( -d $plugin->{backup_dir} ) {
 
       my $basename        = basename( $files->{$file_id}->{file} );
@@ -299,27 +303,24 @@ sub save_editfile {
       };
       if ( $@ ) {
         $status_message = "Could not save backup";
-      }
+      } 
 
     }
   }
+
+  # Write it if there are no errors
+  if ( $status_message eq '' ) { 
+    eval { 
+      open ( my $EDITFILE_OUT, ">", $files->{$file_id}->{file} ) ;
+      print $EDITFILE_OUT $editedfile;
+      close($EDITFILE_OUT);
+    }
+    if ( $@ ) {
+      $status_message = "Could not write changes to file.";
+    }
+  }
   
-  #
-  # Save file
-  #
-  
-  #
-  # Present 
-  #
-  template $app->template($plugin->display_template, 
-             { 
-               status      => $status_message,
-               save_route  => $plugin->save_route,
-               save_method => $plugin->save_method,
-               title       => $files->{$file_id}->{heading},
-#               id          => $id,
-#               edit_file   => $edit_file_source,
-             });
+  $app->send_as( JSON => { save_message => $status_message } );
 }
 
 =back
